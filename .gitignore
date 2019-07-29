@@ -1,0 +1,9 @@
+/Server_Txt/*
+/bin/*
+/obj/*
+/packages/*
+/Properties/*
+Collectorcord.csproj
+Collectorcord.sln
+packages.config
+App.config
