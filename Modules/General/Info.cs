@@ -43,6 +43,7 @@ namespace Collectorcord.Modules.General {
                 "***Version:*** 1.0, 2019/07/22" +
                "***Written in:*** C#\n" +
                 "***Bot Token:*** u wish\n" +
+                "***Bot Source Code:*** https://github.com/Primaski/Collectorcord\n" + 
                 "***Bot Invite Link:*** Not invitable, and never invitable without owner consent. \n" +
                 "***My home:*** https://discord.gg/fVfuuH3");
             return;
