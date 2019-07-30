@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Collectorcord;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +8,14 @@ using Discord;
 using System.IO;
 using Discord.WebSocket;
 using System.Threading;
+using Collectorcord.Server;
+using MySql.Data.MySqlClient;
+using System.Reflection;
+using System;
+using System.Data;
+using Primbot_v._2.Server;
 
-namespace Collectorcord.Modules.General {
+namespace Collectorcord.Modules {
     public class Info : ModuleBase<SocketCommandContext> {
 
         [Command("ping")]
@@ -19,9 +25,9 @@ namespace Collectorcord.Modules.General {
 
         [Command("help")]
         public async Task Help() {
-            await ReplyAsync("Sorry to disappoint! I'm not capable of much yet, I was just created in fact! But the fact that you can see this means that my " +
-                "server is online :) The only two commands so far are `help`, `info` and `ping`. My prefix is `" + 
-                Server.Global_Variables.BOT_PREFIX + "`, and my creator is Primaski#0826.");
+            await ReplyAsync("",false,new EmbedBuilder().WithDescription("Try writing out full sentences! Here are the sentences I currently understand.")
+                .AddField("General","`ping`, `info`, `say`").AddField("Collectors","_ _")
+                .AddField("_ _","`>i collect [pokemon name]` ('nothing' if no pokemon, this is required to create an account").Build());
         }
 
         [Command("invite")]
@@ -43,7 +49,7 @@ namespace Collectorcord.Modules.General {
                 "***Version:*** 1.0, 2019/07/22" +
                "***Written in:*** C#\n" +
                 "***Bot Token:*** u wish\n" +
-                "***Bot Source Code:*** https://github.com/Primaski/Collectorcord\n" + 
+                "***Bot Source Code:*** https://github.com/Primaski/Collectorcord\n" +
                 "***Bot Invite Link:*** Not invitable, and never invitable without owner consent. \n" +
                 "***My home:*** https://discord.gg/fVfuuH3");
             return;

@@ -1,6 +1,7 @@
 /Server_Txt/*
 /bin/*
 /obj/*
+/.vs/*
 /packages/*
 /Properties/*
 Collectorcord.csproj
