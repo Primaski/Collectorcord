@@ -23,6 +23,12 @@ namespace Collectorcord {
         private static CommandService COMMANDS;
         private static IServiceProvider SERVICES;
         public static Program self;
+        public static int alicia = 0;
+        public static int prim = 0;
+
+
+        public static bool on = true;
+        public static List<Tuple<SocketGuildUser,int>> leaderboard = new List<Tuple<SocketGuildUser,int>>();
 
         static void Main(string[] args) {
             Database.ConnectToServer();
@@ -68,7 +74,9 @@ namespace Collectorcord {
 
             await RegisterCommandsAsync();
             AUTH = GetAUTH();
+	    Console.WriteLine("Logging in...");
             await CLIENT.LoginAsync(TokenType.Bot, AUTH);
+	    Console.WriteLine("Starting...");
             await CLIENT.StartAsync();
             await CLIENT.SetGameAsync(BOT_PREFIX + "help");
             
@@ -76,16 +84,25 @@ namespace Collectorcord {
 
         }
 
+
+        
+        
         private Task KillSwitchProtocol(SocketGuildUser user) {
 
-            if (Killswitch.GetState() == Killswitch.Status.Off || user.Guild.Id != 597469488778182656) {
+            if (user.Guild.Id == 597469488778182656) {
+                if (Killswitch.GetState() == Killswitch.Status.Off) {
+                    if (Server.Util.Poke_Cache != null) {
+                        Server.Util.Poke_Cache.GetTextChannel(598458534405079041)
+                            .SendMessageAsync("<@&598486932699217940>" + user.Username + " has joined, help them out!");
+                    }
                 return Task.CompletedTask;
-            } else if (Killswitch.GetState() == Killswitch.Status.Mute) {
-                user.AddRoleAsync(user.Guild.GetRole(472806594292482088)); //skipped
-            } else if (Killswitch.GetState() == Killswitch.Status.Kick) {
-                user.KickAsync();
-            } else if (Killswitch.GetState() == Killswitch.Status.Ban) {
-                user.Guild.AddBanAsync(user);
+                } else if (Killswitch.GetState() == Killswitch.Status.Mute) {
+                    user.AddRoleAsync(user.Guild.GetRole(472806594292482088)); //skipped
+                } else if (Killswitch.GetState() == Killswitch.Status.Kick) {
+                    user.KickAsync();
+                } else if (Killswitch.GetState() == Killswitch.Status.Ban) {
+                    user.Guild.AddBanAsync(user);
+                }
             }
             return Task.CompletedTask;
         }
@@ -132,15 +149,57 @@ namespace Collectorcord {
 
 
         private async Task HandleCommandAsync(SocketMessage arg) {
-            var message = (SocketUserMessage)arg;
-
-
+            SocketUserMessage message = null;
+            try {
+                message = (SocketUserMessage)arg;
+            } catch {
+                try {
+                    var ohno = (SocketSystemMessage)arg;
+                    Console.WriteLine(ohno.Content);
+                    return;
+                }catch(Exception e) {
+                    Console.WriteLine(e.Message);
+                }
+            }
 
             var context = new SocketCommandContext(CLIENT, message);
 
             int argPos = 0;
 
-
+            if (on) {
+                if (message.Channel.Id == 597787231641534474) {
+                    Console.WriteLine("msg sent");
+                    if (message.Author.Id == 365975655608745985) {
+                       
+                        if (message.Content.Contains("Congratulations")) {
+                            try {
+                                string userUnparsed = message.Content.Split(' ')[1];
+                                SocketGuildUser user = Server.Util.InterpretUserInput(userUnparsed)?[0];
+                                if (user == null) { Console.WriteLine("User was null: " + userUnparsed); return; }
+                                bool found = false;
+                                for (int i = 0; i < leaderboard.Count(); i++) {
+                                    var curr = leaderboard[i];
+                                    if (curr.Item1.Id == user.Id) {
+                                        leaderboard[i] = new Tuple<SocketGuildUser, int>(curr.Item1, curr.Item2 + 1);
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (!found) {
+                                    leaderboard.Add(new Tuple<SocketGuildUser, int>(user, 1));
+                                }
+                                StringBuilder stb = new StringBuilder();
+                                stb.Append("Current leaderboard!\n");
+                                var currlb = leaderboard.OrderByDescending(x => x.Item2);
+                                foreach (var grouping in currlb) {
+                                    stb.AppendLine("**" + grouping.Item1 + "** -" + grouping.Item2.ToString() + " points");
+                                }
+                                await message.Channel.SendMessageAsync(stb.ToString());
+                            } catch (Exception e) { Console.WriteLine(e.Message + "\n" + e.StackTrace); }
+                        }
+                    }
+                }
+            }
 
             //if (GuildCache.SearchAwaitedMessage(context.Guild.Id, context.Channel.Id, context.User.Id, context.Message.Content) != -1) {}
 

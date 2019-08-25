@@ -71,14 +71,14 @@ namespace Collectorcord.Server.Listings {
                     if (userm == null) {
                         mention = cached;
                     } else {
-                        mention = userm.Mention;
+                        mention = userm.Mention + " (" + userm.Username + ")";
                     }
                     string startdesc = (pokemon == "") ?
                         (TextUtil.Capitalize(pokename) + " --> ") : "";
                     description += startdesc + mention + "\n";
                 }
             } catch (Exception e) {
-                return (new EmbedBuilder().WithTitle(e.Message + "\n" + e.StackTrace)).Build();
+                return (new EmbedBuilder().WithTitle("No one collects this Pokemon yet!").Build());
             }
 
             return (result.WithDescription(description).Build());
@@ -86,16 +86,18 @@ namespace Collectorcord.Server.Listings {
         }
 
         public static Embed WhatDoesUserCollect(SocketGuildUser context, ulong userID) {
+	    //Console.WriteLine("got here");
             string query = "SELECT c.pokename " +
                 "FROM Collections c " +
                 "WHERE c.userID = " + userID.ToString();
             DataTable dt = Database.Query(query);
+	    Console.WriteLine(dt);
 
             string ID, pokename, cached; string mention = ""; string description = "";
             EmbedBuilder result = new EmbedBuilder()
                 .WithTitle(spoink + " They collect: " + azu)
                 .WithColor(Color.Purple);
-
+	    Console.WriteLine("got here");
             try {
                 for (int i = 0; i < 10 && i < dt.Rows.Count; i++) {
                     string pokemon = dt.Rows[i].ItemArray[0].ToString();

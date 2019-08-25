@@ -33,10 +33,14 @@ namespace Collectorcord.Server.User {
                         return ("Error in creating account. Terminating.");
                     }
                 }
-                bool success = Database.AddEntry("Collections",
+		bool success = false;
+		try{
+                success = Database.AddEntry("Collections",
                                 new string[] { "userID", "pokename", "recorded" },
                                 new string[] { user.Id.ToString(), "nothing", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") });
-
+		}catch(Exception e){
+			return e.Message + "\n" + e.StackTrace;
+		}
                 if (success) {
                     return "Thank you! I made you an account and specified that you collect nothing.";
                 } else {
@@ -61,13 +65,19 @@ namespace Collectorcord.Server.User {
                     if (pokemon == "eeveelution" || pokemon == "eeveelutions") {
 
                     } else {
+			try{
                         success = Database.AddEntry(
                             "Collections",
                             new string[] { "userID", "pokename", "recorded" },
                             new string[] { user.Id.ToString(), pokemon, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") });
-                    }
+                    	}catch{
+				return "I already know you collect " + pokemon + ", silly!";
+			}
+			}
                     if (success) {
+			try{
                         AddCollectorRoles(user, pokemon);
+			}catch{}
                         return ("Thank you! I now know that **" + user.Username + "** collects **" + Capitalize(pokemon) + "**!" +
                             "Type in `" + Server.Global_Variables.BOT_PREFIX + "collectors` or `" +
                             Server.Global_Variables.BOT_PREFIX + "who collects " + pokemon + "` to see your addition!");
@@ -78,8 +88,12 @@ namespace Collectorcord.Server.User {
                     return (e.Message + "\n `" + e.StackTrace + "`");
                 }
             } else {
+		try{
+			return CollectSpecialCases(user,pokemon);
+		}catch{
+		}
                 return ("That Pokemon does not exist! Make sure you're only specifying one at a time. " +
-                    "Try something like, `/icollect spoink`");
+                    "Try something like, `>icollect spoink`");
             }
         }
 
@@ -87,19 +101,24 @@ namespace Collectorcord.Server.User {
             throw new NotImplementedException();
         }
 
-        private void CollectSpecialCases(SocketGuildUser user, string args) {
+        private static string CollectSpecialCases(SocketGuildUser user, string args) {
             if (args == "eeveelution" || args == "eeveelutions") {
                 string[] eeveelutions = { "eevee", "flareon", "glaceon", "jolteon", "leafeon", "sylveon", "umbreon", "vaporeon" };
                 foreach (string eon in eeveelutions) {
                     if (Util.HasRole(user, Capitalize(eon))) {
-                        return;
+                        return "I already know you collect" + Capitalize(eon) + "!";
                     }
                     Database.AddEntry(
                         "Collections",
                         new string[] { "userID", "pokename", "recorded" },
                         new string[] { user.Id.ToString(), eon, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") });
                 }
+		return "Thank you! I now know that **" + user.Username + "** collects **eeveelutions**!" +
+                            "Type in `" + Server.Global_Variables.BOT_PREFIX + "collectors` or `" +
+                            Server.Global_Variables.BOT_PREFIX + "who collects eeveelutions` to see your addition!";
             }
+	        return ("That Pokemon does not exist! Make sure you're only specifying one at a time. " +
+                    "Try something like, `>icollect spoink`");
         }
 
         private static void AddCollectorRoles(SocketGuildUser user, string pokemon) {
@@ -107,6 +126,7 @@ namespace Collectorcord.Server.User {
                 var role = Util.GetRole("Collector");
                 (user as IGuildUser).AddRoleAsync(role);
             }
+		/*
             if (!Util.HasRole(user, Capitalize(pokemon))) {
                 if (!Util.RoleExists(Capitalize(pokemon))) {
                     try {
@@ -123,6 +143,7 @@ namespace Collectorcord.Server.User {
                 }
 
             }
+		*/
         }
 
         public static bool CreateAccount(SocketUser user) {

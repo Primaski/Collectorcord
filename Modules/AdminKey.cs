@@ -38,12 +38,14 @@ namespace Collectorcord.Modules {
         }
 
         [Command("res")]
-        public async Task Restart([Remainder] string args = null) {
-            if (!Util.HasRole((SocketGuildUser)Context.User, "Moderator")) {
+        public async Task Restart() {
+            if (!Util.HasRole((SocketGuildUser)Context.User, "Moderator") &&
+		!Util.HasRole((SocketGuildUser)Context.User, "Helper") &&
+		!Util.HasRole((SocketGuildUser)Context.User, "Trial Mod")) {
                 await ReplyAsync("This role was intended for Moderators, and you lack the appropriate permissions."); return;
             } else {
-                string res = Server.General.Admin.Query(args);
-                await ReplyAsync(res);
+                await ReplyAsync("`Restarting...`");
+                string res = Server.General.Admin.Restart();
             }
         }
 

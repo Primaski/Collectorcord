@@ -18,7 +18,7 @@ namespace Collectorcord.Server.User {
     public class Badges {
 
         public static Embed SnipePass(SocketGuildUser user, string grant = "") {
-            
+            grant = (grant == null) ? "" : grant;
             if (grant == "") {
                 //show off
                 if (Database.ValueExists("Users", "userID", user.Id.ToString())) {

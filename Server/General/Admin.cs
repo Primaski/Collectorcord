@@ -15,6 +15,14 @@ using Primbot_v._2.Server;
 namespace Collectorcord.Server.General {
     public class Admin  {
 
+        public static bool GiveSnipePass(ulong userID) {
+            string result = Query("UPDATE Users u set u.permSnipe = true WHERE u.userID = " + userID.ToString());
+            if(result == "RecordsAffected: 1") {
+                return true;
+            }
+            return false;
+        }
+
         public static string Killswitchactivate(string args) {
             if (args == null) {
                 string u =(Killswitch.GetHelpMenu() + "\n" + "The current state of the Killswitch is: `" + Killswitch.GetState() + "`.");
@@ -35,11 +43,12 @@ namespace Collectorcord.Server.General {
         }
 
         public static string Query(string query) {
-            if(query == null || query == "") {
+            if (query == null || query == "") {
                 return "Argument `query` cannot be null.";
             }
             DataTable dt = Database.Query(query);
-            return (dt.ToString());
+            string returning = dt.Rows[0]?.ItemArray[0]?.ToString() ?? "null";
+            return (returning);
         }
 
         public static string Restart() {

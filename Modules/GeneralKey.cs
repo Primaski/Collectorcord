@@ -18,6 +18,32 @@ using Primbot_v._2.Server;
 namespace Collectorcord.Modules {
     public class Info : ModuleBase<SocketCommandContext> {
 
+	[Command("say", RunMode = RunMode.Async)]
+        public async Task Say([Remainder] string args = null) {
+            if (args == null) {
+                await ReplyAsync("I mean, like, what do you want me to say?");
+            } else {
+                if (args.Contains(">")) {
+                    await ReplyAsync("Why are you trying to break me?");
+                    return;
+                }
+                if (args.Contains("@everyone") || args.Contains("@here")) {
+                    await ReplyAsync("Say that again, but without the ping.");
+                    return;
+                }
+                await Context.Message.DeleteAsync();
+                await ReplyAsync(args);
+
+            }
+        }
+
+	
+        [Command("snipepass")]
+        public async Task Snipepass([Remainder] string args = null) {
+            Embed response = Server.User.Badges.SnipePass((SocketGuildUser)Context.User,args);
+            await ReplyAsync("", false, response);
+        }
+
         [Command("ping")]
         public async Task Ping() {
             await ReplyAsync("Pong! My latency is `" + Context.Client.Latency + " ms`!");
@@ -27,7 +53,8 @@ namespace Collectorcord.Modules {
         public async Task Help() {
             await ReplyAsync("",false,new EmbedBuilder().WithDescription("Try writing out full sentences! Here are the sentences I currently understand.")
                 .AddField("General","`ping`, `info`, `say`").AddField("Collectors","_ _")
-                .AddField("_ _","`>i collect [pokemon name]` ('nothing' if no pokemon, this is required to create an account").Build());
+                .AddField("_ _","`>i collect [pokemon name]` ('nothing' if no pokemon, this is required to create an account)\n" +
+		"`>i don't collect [pokemon]` (to revert)\n `>who collects [pokemon name]` \n `>what does [user] collect` \n `>snipepass`").Build());
         }
 
         [Command("invite")]

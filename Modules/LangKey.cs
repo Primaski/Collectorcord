@@ -111,7 +111,7 @@ namespace Collectorcord.Modules {
             }
             switch (splits[1]) {
                 case "collect": return WhatDoesUserCollect(user, mention[0].Id);
-                default: return new EmbedBuilder().WithTitle("I'm not sure what you mean!").Build();
+                default: return new EmbedBuilder().WithTitle("I'm not sure what you mean!!").Build();
             }
 
         }

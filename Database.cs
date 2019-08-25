@@ -100,16 +100,25 @@ namespace Collectorcord {
         }
 
         public static DataTable Query(string query = null, Function function = Function.Select) {
-            string ret = "";
             MySqlCommand cmd = conn.CreateCommand();
             cmd.CommandText = query;
+	    //Console.WriteLine("gh");
             MySqlDataReader reader = cmd.ExecuteReader();
             try {
                 DataTable dt = new DataTable();
+                if (!reader.HasRows) { //possible update action
+                    dt.Columns.Add(new DataColumn {
+                        ColumnName = "RowsAffected"
+                    });
+                    dt.Rows.Add(dt.NewRow()[0] = "RecordsAffected: " + reader.RecordsAffected.ToString());
+		    reader.Close();
+                    return dt;
+                }
+		//Console.WriteLine("ghh");
                 dt.Load(reader);
-                reader.Close();
+		reader.Close();
                 return dt;
-            }catch(Exception e) {
+            } catch (Exception e) {
                 Console.WriteLine(e.Message);
                 reader.Close();
             }
